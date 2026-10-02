@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "run_id": "OG-SYNTHETIC-500K",
+  "measured_at": "2026-10-01T21:48:44.865Z",
+  "scope": "Local synthetic DuckDB transform only; excludes fixture generation, auditing, AI compilation, and Neo4j persistence.",
+  "engine": "DuckDB v1.5.6",
+  "hardware": {
+    "cpu": "Intel(R) Xeon(R) CPU E5-2686 v4 @ 2.30GHz",
+    "logical_cores": 36,
+    "ram_gib": 32,
+    "platform": "win32 x64",
+    "threads": 4,
+    "memory_limit": "2GB"
+  },
+  "source": {
+    "format": "Parquet / ZSTD",
+    "rows": 500000,
+    "sha256": "a15993df45f5aa4511d9bff85a0d7f69e43cbaf32d1cb7f5cbb86faccfc6e931",
+    "synthetic": true
+  },
+  "reconciliation": {
+    "input_rows": 500000,
+    "canonical_entities": 447000,
+    "duplicate_rows_collapsed": 53000,
+    "rejected_rows": 0,
+    "count_balance": true
+  },
+  "graph_projection": {
+    "expected_customer_nodes": 447000,
+    "persisted": false,
+    "neo4j_elapsed_ms": null
+  },
+  "benchmark": {
+    "runs": [
+      {
+        "run": 1,
+        "elapsed_ms": 272.73,
+        "output_rows": 447000,
+        "unique_keys": 447000,
+        "result_checksum_md5": "e061f0af1a7c0226e9e5d00fcbdfc0be"
+      },
+      {
+        "run": 2,
+        "elapsed_ms": 226.96,
+        "output_rows": 447000,
+        "unique_keys": 447000,
+        "result_checksum_md5": "e061f0af1a7c0226e9e5d00fcbdfc0be"
+      },
+      {
+        "run": 3,
+        "elapsed_ms": 250.42,
+        "output_rows": 447000,
+        "unique_keys": 447000,
+        "result_checksum_md5": "e061f0af1a7c0226e9e5d00fcbdfc0be"
+      }
+    ],
+    "median_ms": 250.42,
+    "cache_policy": "Three consecutive runs in one process; no OS cache flush. Median reported.",
+    "repeated_results_match": true,
+    "model_api_cost_usd": 0
+  },
+  "transform_sql": "CREATE OR REPLACE TABLE canonical_customers AS\nSELECT customer_id,\n       arg_max(lower(trim(email)), source_row_id) AS email_key,\n       arg_max(display_name, source_row_id) AS display_name\nFROM read_parquet($source)\nWHERE customer_id IS NOT NULL\nGROUP BY customer_id;"
+}
